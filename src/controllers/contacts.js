@@ -32,17 +32,14 @@ export const getContactByIdController = async (req, res, next) => {
   const { contactId } = req.params;
   const userId = req.user._id;
 
-  const contact = await getContactById(contactId);
-
+  const contact = await getContactById(contactId, userId);
   if (!contact) {
-    throw createHttpError(404, 'Contact not found');
+    throw createHttpError(404, 'Contact no found');
   }
-
   if (contact.userId.toString() !== userId.toString()) {
     return next(createHttpError(403, 'Access denied'));
   }
-
-  res.status(200).json({
+  res.json({
     status: 200,
     message: `Successfully found contact with id ${contactId}!`,
     data: contact,
