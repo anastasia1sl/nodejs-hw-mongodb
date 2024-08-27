@@ -25,9 +25,11 @@ const contactsSchema = new Schema(
       default: 'personal',
     },
     userId: { type: Schema.Types.ObjectId },
+    photo: { type: String },
   },
   {
     timestamps: true,
+    versionKey: false,
   },
 );
 
