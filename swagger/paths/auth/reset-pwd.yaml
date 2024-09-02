@@ -1,0 +1,59 @@
+tags:
+  - Auth
+summary: User password reset
+operationId: resetPassword
+description: 'Allows users to reset their password'
+security:
+  - bearerAuth: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - password
+          - token
+        properties:
+          password:
+            description: 'The new password value that should be set'
+            type: string
+            minLength: 6
+            example: 'newpassword'
+          token:
+            description: 'The token used to verify the password reset request.'
+            type: string
+            example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZmRmZGZkZmQiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.NxdgT_0soFadGmerJEqhtFmdz4eq5--Ky51TMHhzNIg
+  description: 'New password and reset token.'
+responses:
+  '200':
+    description: Password was successfully reset
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Password has been successfully reset!
+  '400':
+    description: Bad request, invalid details.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: Invalid input data, password can't be reset.
+  '401':
+    $ref: '../../components/responses/401.yaml'
