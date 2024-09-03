@@ -13,7 +13,6 @@ tags:
     description: Authentication operations.
 servers:
   - url: https://nodejs-hw-mongodb-11-et6b.onrender.com
-  - url: https://nodejs-hw-mongodb-11-et6b.onrender.com
 paths:
   /contacts:
     get:
@@ -46,7 +45,6 @@ paths:
   /auth/logout:
     post:
       $ref: ../swagger/paths/auth/logout.yaml
-
 components:
   securitySchemes:
     bearerAuth:
