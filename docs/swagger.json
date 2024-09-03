@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
+      "url": "https://nodejs-hw-mongodb-13-lwl5.onrender.com"
     }
   ],
   "tags": [
@@ -229,7 +229,8 @@
                   },
                   "photo": {
                     "description": "Photo of the contact",
-                    "type": "string"
+                    "type": "string",
+                    "format": "binary"
                   }
                 }
               }
@@ -394,7 +395,8 @@
                   },
                   "photo": {
                     "description": "Photo of the contact",
-                    "type": "string"
+                    "type": "string",
+                    "format": "binary"
                   }
                 }
               }
@@ -562,6 +564,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
           },
           "409": {
             "$ref": "#/components/responses/409"
@@ -956,6 +961,26 @@
       }
     },
     "responses": {
+      "400": {
+        "description": "Bad request, invalid input data.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 400
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Invalid input data. Please check the request body."
+                }
+              }
+            }
+          }
+        }
+      },
       "401": {
         "description": "Unauthorized error",
         "content": {
