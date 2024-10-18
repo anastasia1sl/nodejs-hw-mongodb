@@ -7,7 +7,7 @@ import { validateParams } from '../middlewares/validateParams.js';
 import {
   createWaterSchema,
   updateWaterSchema,
-  dateSchema,
+  // dateSchema,
   monthSchema,
 } from '../validation/water.js';
 import {
@@ -38,11 +38,14 @@ waterRouter.patch(
 
 waterRouter.delete('/:id', isValidWaterId, ctrlWrapper(deleteWaterController));
 
-waterRouter.get(
-  '/day/:date',
-  validateParams(dateSchema),
-  ctrlWrapper(getWaterByDayController),
-);
+waterRouter.get('/day', ctrlWrapper(getWaterByDayController));
+
+// waterRouter.get(
+//   //// get all records per specific day
+//   '/day/:date',
+//   validateParams(dateSchema),
+//   ctrlWrapper(getWaterByDayController),
+// );
 
 waterRouter.get(
   '/month/:date',

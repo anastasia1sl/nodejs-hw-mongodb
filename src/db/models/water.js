@@ -4,8 +4,10 @@ const waterSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'users' },
     value: { type: Number, required: true },
-    date: { type: Date, required: true },
-    time: { type: String, required: true },
+    dateTime: {
+      type: String,
+      // default: () => new Date().toLocaleString('en-GB'),
+    },
   },
   { timestamps: true, versionKey: false },
 );
