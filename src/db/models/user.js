@@ -5,6 +5,7 @@ const usersSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    dailyNorma: { type: Number, default: 1500, min: 1000, max: 10000 }, //// this should be in user
   },
   { timestamps: true, versionKey: false },
 );
