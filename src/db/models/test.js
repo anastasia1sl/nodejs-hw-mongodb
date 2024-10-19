@@ -9,13 +9,14 @@ const waterSchema = new Schema(
     },
     dateTime: {
       type: String,
+      required: true,
     },
-    userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    userId: { type: Schema.Types.ObjectId, required: true },
   },
-
-  { timestamps: true, versionKey: false },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
 
-const WaterCollection = model('water', waterSchema);
-
-export default WaterCollection;
+export const TestCollection = model('test', waterSchema);
