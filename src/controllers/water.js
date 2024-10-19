@@ -3,42 +3,69 @@ import {
   addWaterDataService,
   editWaterService,
   deleteWaterService,
+  getAllRecords,
   getWaterByDayService,
   getWaterByMonthService,
 } from '../services/water.js';
 
-export const createWaterController = async (req, res) => {
-  const userId = req.user._id;
-  const { value } = req.body;
+export function formatDateTime(dateTimeString) {
+  const date = new Date(dateTimeString);
 
-  try {
-    const newWaterRecord = await addWaterDataService(userId, value);
-    res.status(201).json({
-      status: 201,
-      message: 'Successfully added water!',
-      data: newWaterRecord,
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: 400,
-      message: error.message,
-    });
+  // Получаем компоненты даты и времени
+  const day = String(date.getDate()).padStart(2, '0'); // День
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц (месяцы в JS считаются с 0)
+  const year = date.getFullYear(); // Год
+
+  const hours = String(date.getHours()).padStart(2, '0'); // Часы
+  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты
+  const seconds = String(date.getSeconds()).padStart(2, '0'); // Секунды
+
+  // Формируем строку в нужном формате
+  const formattedDateTime = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+
+  return formattedDateTime;
+}
+
+export const createWaterController = async (req, res, next) => {
+  const { value, dateTime } = req.body;
+  const userId = req.user._id;
+
+  if (!value) {
+    return next(createHttpError(400, 'Required fields are missing'));
   }
+
+  const currentDate = new Date();
+
+  const dateToUse = dateTime ? dateTime : formatDateTime(currentDate);
+
+  const waterRecord = await addWaterDataService({
+    value,
+    dateTime: dateToUse,
+    userId,
+  });
+
+  res.status(201).json({
+    status: 201,
+    message: 'Water record created successfully!',
+    data: waterRecord,
+  });
 };
 
 export const editWaterController = async (req, res, next) => {
   const { id } = req.params;
-  const userId = req.user._id;
 
-  const result = await editWaterService(id, userId, { ...req.body });
+  const result = await editWaterService(id, {
+    ...req.body,
+  });
 
-  if (result === null) {
-    next(createHttpError(404, 'Data not found to update'));
+  if (!result) {
+    next(createHttpError(404, 'Contact not found'));
+    return;
   }
 
-  res.status(200).json({
+  res.json({
     status: 200,
-    message: 'Successfully edit the water record!',
+    message: 'Successfully patched a contact!',
     data: result,
   });
 };
@@ -47,17 +74,29 @@ export const deleteWaterController = async (req, res, next) => {
   const { id } = req.params;
   const userId = req.user._id;
 
-  const deletedWater = await deleteWaterService(id, userId);
+  const waterToDelete = await deleteWaterService(id, userId);
 
-  if (!deletedWater) {
-    next(createHttpError(404, 'Data not found'));
+  if (!waterToDelete) {
+    next(createHttpError(404, 'Contact not found'));
+    return;
   }
+
   res.status(200).send({ status: 200, data: { id } });
 };
 
-export const getWaterByDayController = async (req, res) => {
-  //// get water by day *today
+export const getAllWaterByIdController = async (req, res) => {
+  const waterRecords = await getAllRecords({
+    userId: req.user._id,
+  });
 
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully found contacts!',
+    data: waterRecords,
+  });
+};
+
+export const getWaterByDayController = async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -69,7 +108,7 @@ export const getWaterByDayController = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: `'Error fetching water data:' ${error.message}`,
+      message: `Error fetching water data: ${error.message}`,
     });
   }
 };
