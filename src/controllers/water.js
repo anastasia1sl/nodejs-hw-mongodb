@@ -4,27 +4,12 @@ import {
   editWaterService,
   deleteWaterService,
   getAllRecords,
-  getWaterByDayService,
+  getWaterTodayService,
   getWaterByMonthService,
+  getWaterByDateService,
 } from '../services/water.js';
 
-export function formatDateTime(dateTimeString) {
-  const date = new Date(dateTimeString);
-
-  // Получаем компоненты даты и времени
-  const day = String(date.getDate()).padStart(2, '0'); // День
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц (месяцы в JS считаются с 0)
-  const year = date.getFullYear(); // Год
-
-  const hours = String(date.getHours()).padStart(2, '0'); // Часы
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты
-  const seconds = String(date.getSeconds()).padStart(2, '0'); // Секунды
-
-  // Формируем строку в нужном формате
-  const formattedDateTime = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-
-  return formattedDateTime;
-}
+import { formatDateTime } from '../utils/formatDate.js';
 
 export const createWaterController = async (req, res, next) => {
   const { value, dateTime } = req.body;
@@ -96,11 +81,11 @@ export const getAllWaterByIdController = async (req, res) => {
   });
 };
 
-export const getWaterByDayController = async (req, res) => {
+export const getWaterTodayController = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const waterData = await getWaterByDayService(userId);
+    const waterData = await getWaterTodayService(userId);
     res.status(200).json({
       success: true,
       data: waterData,
@@ -111,6 +96,23 @@ export const getWaterByDayController = async (req, res) => {
       message: `Error fetching water data: ${error.message}`,
     });
   }
+};
+
+export const getWaterByDateController = async (req, res, next) => {
+  const { date } = req.params;
+  const userId = req.user._id;
+
+  const waterByDate = await getWaterByDateService(userId, date);
+
+  if (!waterByDate) {
+    return next(createHttpError.NotFound(`Water not found by date ${date}`));
+  }
+
+  res.status(200).json({
+    status: 200,
+    message: 'Water by date found successfully',
+    date: waterByDate,
+  });
 };
 
 export const getWaterByMonthController = async (req, res) => {

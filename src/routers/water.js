@@ -8,14 +8,16 @@ import {
   createWaterSchema,
   updateWaterSchema,
   monthSchema,
+  dateSchema,
 } from '../validation/water.js';
 import {
   createWaterController,
   editWaterController,
   deleteWaterController,
-  getWaterByDayController,
+  getWaterByDateController,
   getAllWaterByIdController,
   getWaterByMonthController,
+  getWaterTodayController,
 } from '../controllers/water.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
@@ -38,14 +40,20 @@ waterRouter.patch(
 
 waterRouter.delete('/:id', isValidWaterId, ctrlWrapper(deleteWaterController));
 
-waterRouter.get('/day', ctrlWrapper(getWaterByDayController)); //// water/day
-
 waterRouter.get('/', ctrlWrapper(getAllWaterByIdController));
+
+waterRouter.get('/day', ctrlWrapper(getWaterTodayController));
 
 waterRouter.get(
   '/month/:date',
   validateParams(monthSchema),
   ctrlWrapper(getWaterByMonthController),
+);
+
+waterRouter.get(
+  '/day/:date',
+  validateParams(dateSchema),
+  ctrlWrapper(getWaterByDateController),
 );
 
 export default waterRouter;
