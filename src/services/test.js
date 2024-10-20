@@ -20,7 +20,7 @@ export const updateWaterService = async (
   );
 
   return {
-    result: water.value,
+    data: water.value,
     isNew: Boolean(water?.lastErrorObject?.upserted),
   };
 };
@@ -62,90 +62,6 @@ export const getmonthWaterService = async (userId, yearMonth) => {
 
   return water;
 };
-
-// export const createDailyWaterArrayWithValues = async (userId, yearMonth) => {
-//   const waterRecords = await getmonthWater(userId, yearMonth); // Fetch water records for the month
-//   const [year, month] = yearMonth.split('-').map(Number);
-//   const daysInMonth = new Date(year, month, 0).getDate(); // Get the number of days in the month
-//   const dailyWaterArray = [];
-
-//   // Initialize an array for each day of the month
-//   for (let day = 1; day <= daysInMonth; day++) {
-//     const dayString = day < 10 ? `0${day}` : day; // Format day as DD
-//     const dateKey = `${year}-${
-//       month < 10 ? `0${month}` : month
-//     }-${dayString}T00:00:00`; // Create YYYY-MM-DDTHH:mm:ss format
-
-//     // Find water record for the specific day
-//     const recordForDay = waterRecords.find((record) => {
-//       const recordDate = new Date(record.dateTime).toISOString(); // Format record date in YYYY-MM-DDTHH:mm:ss
-//       return recordDate.startsWith(dateKey.split('T')[0]); // Check if the date matches (ignoring time)
-//     });
-
-//     // Push the day's data into the array
-//     dailyWaterArray.push({
-//       date: dateKey, // Use the correct date format
-//       value: recordForDay ? recordForDay.value : 0, // Use record value or null if no data
-//     });
-//   }
-
-//   return dailyWaterArray;
-// };
-
-// export const createDailyWaterArrayWithValues = async (userId, yearMonth) => {
-//   // Fetch the user's daily water norm from UserCollection
-//   const user = await UsersCollection.findById(userId);
-//   const dailyNorm = user.dailyNorma; // Assuming the field is 'dailyNorm'
-
-//   const waterRecords = await getmonthWaterService(userId, yearMonth); // Fetch water records for the month
-//   const [year, month] = yearMonth.split('-').map(Number);
-//   const daysInMonth = new Date(year, month, 0).getDate(); // Get the number of days in the month
-//   const dailyWaterArray = [];
-
-//   // Initialize an array for each day of the month
-//   for (let day = 1; day <= daysInMonth; day++) {
-//     const dayString = day < 10 ? `0${day}` : day; // Format day as DD
-//     const dateKey = `${year}-${
-//       month < 10 ? `0${month}` : month
-//     }-${dayString}T00:00:00`; // Create YYYY-MM-DDTHH:mm:ss format
-
-//     // Find water records for the specific day
-//     const recordsForDay = waterRecords.filter((record) => {
-//       const recordDate = new Date(record.dateTime).toISOString().split('T')[0]; // Format record date in YYYY-MM-DD
-//       return (
-//         recordDate ===
-//         `${year}-${month < 10 ? `0${month}` : month}-${dayString}`
-//       ); // Check if the date matches
-//     });
-
-//     // Calculate total water consumed, count of records, and percentage
-//     const totalConsumed = recordsForDay.reduce(
-//       (sum, record) => sum + record.value,
-//       0,
-//     ); // Sum of all values
-//     const countOfConsumptions = recordsForDay.length; // Count of records
-//     let percentageOfDailyNorm =
-//       countOfConsumptions > 0
-//         ? ((totalConsumed / dailyNorm) * 100).toFixed(2)
-//         : 0; // Percentage calculation
-
-//     // Cap the percentage at 100
-//     percentageOfDailyNorm = Math.min(percentageOfDailyNorm, 100);
-
-//     // Create an object for the day
-//     dailyWaterArray.push({
-//       date: `${day} ${new Intl.DateTimeFormat('en-US', {
-//         month: 'long',
-//       }).format(new Date(year, month - 1, day))}`, // "5 April"
-//       dailyNorm: `${dailyNorm} L`, // Daily norm in liters
-//       consumed: totalConsumed.toFixed(2) + ' L', // Total consumed in liters
-//       percentage: `${percentageOfDailyNorm}%`, // Capped percentage of daily norm
-//       consumptionCount: countOfConsumptions, // Count of consumption records
-//     });
-//   }
-
-//   return dailyWaterArray;
-// };
 
 export const createDailyWaterArrayWithValues = async (userId, yearMonth) => {
   const user = await UsersCollection.findById(userId);

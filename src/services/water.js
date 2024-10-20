@@ -1,7 +1,7 @@
 import WaterCollection from '../db/models/water.js';
 import { UsersCollection } from '../db/models/user.js';
 
-import { formatDateTime } from '../controllers/water.js';
+import formatDateTime from '../utils/formatDate.js';
 
 export const addWaterDataService = async (payload) => {
   const water = await WaterCollection.create(payload);
@@ -27,7 +27,7 @@ export const deleteWaterService = async (id) => {
 
 export const getAllRecords = () => WaterCollection.find();
 
-export const getWaterByDayService = async (userId) => {
+export const getWaterTodayService = async (userId) => {
   const user = await UsersCollection.findById(userId);
 
   if (!user) {
@@ -37,13 +37,10 @@ export const getWaterByDayService = async (userId) => {
   const dailyNorma = user.dailyNorma;
 
   const currentDate = new Date();
-  console.log(currentDate);
   const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
-  console.log(startOfDay);
   const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
-  console.log(endOfDay);
 
-  /// formating to  "MM/DD/YYYY, HH:mm:ss"
+  // formating to format DD-MM-YY HH:MM:SS
   const startOfDayString = formatDateTime(startOfDay);
   const endOfDayString = formatDateTime(endOfDay);
 
@@ -68,6 +65,18 @@ export const getWaterByDayService = async (userId) => {
   };
 };
 
+export const getWaterByDateService = async (userId, date) => {
+  const startOfDay = `${date} 00:00:00`;
+  const endOfDay = `${date} 23:59:59`;
+
+  const water = await WaterCollection.find({
+    userId,
+    dateTime: { $gte: startOfDay, $lte: endOfDay },
+  });
+
+  return water;
+};
+
 export const getWaterByMonthService = async (userId, month, year) => {
   const user = await UsersCollection.findById(userId);
 
@@ -77,7 +86,7 @@ export const getWaterByMonthService = async (userId, month, year) => {
 
   const dailyNorma = user.dailyNorma;
 
-  // Формируем начало и конец месяца в строковом формате
+  /// start and end of month
   const monthString = String(month).padStart(2, '0');
   const startOfMonth = `01-${monthString}-${year}`;
   const endOfMonth = `${new Date(
@@ -86,22 +95,18 @@ export const getWaterByMonthService = async (userId, month, year) => {
     0,
   ).getDate()}-${monthString}-${year}`;
 
-  // Получаем записи о потреблении воды за месяц на основе диапазона строк
   const waterRecords = await WaterCollection.find({
     userId,
     dateTime: {
-      $gte: startOfMonth, // начиная с начала месяца
-      $lte: `${endOfMonth} 23:59:59`, // до конца месяца (включая время)
+      $gte: startOfMonth,
+      $lte: `${endOfMonth} 23:59:59`,
     },
   });
 
-  // Создаем объект для хранения данных по дням
   const dailyConsumption = {};
 
-  // Получаем количество дней в месяце
   const daysInMonth = new Date(year, month, 0).getDate();
 
-  // Инициализируем объект с нулевыми значениями для каждого дня месяца
   for (let day = 1; day <= daysInMonth; day++) {
     const formattedDate = `${String(day).padStart(
       2,
